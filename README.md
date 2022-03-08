@@ -24,8 +24,7 @@ Change addresses, container names, and ports accordingly to your config.
 1. [Test topic creation] List topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
 1. [Test topic creation] List topics on dest: ```docker-compose exec destbro kafka-topics --bootstrap-server=localhost:9093 --list```
 1. Add ACLs to source topic ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --add --allow-principal User:ANONYMOUS --operation Read --operation Describe --topic foo --resource-pattern-type prefixed```
-1. 
-
+1. cd MMaker > ```docker build -f .\Dockerfile-mm -t myrep .``` > ```docker run --net=kafka-mm_default --name therep -dt myrep``
 
 ## TODO
 - [Replicator] a lot of unmapped configs (investigate file /etc/replicator/replication.properties)
@@ -37,3 +36,9 @@ Change addresses, container names, and ports accordingly to your config.
         Current ACLs for resource `ResourcePattern(resourceType=TOPIC, name=foo, patternType=PREFIXED)`:
         (principal=User:ANONYMOUS, host=*, operation=DESCRIBE, permissionType=ALLOW)
         (principal=User:ANONYMOUS, host=*, operation=READ, permissionType=ALLOW)
+
+## References
+1. Confluent Replicator: 
+    - [Replicator Docs](https://docs.confluent.io/platform/current/multi-dc-deployments/replicator/index.html)
+    - [Config Options](https://docs.confluent.io/platform/current/multi-dc-deployments/replicator/configuration_options.html)
+    - [Replicator Tutorial](https://docs.confluent.io/platform/current/multi-dc-deployments/replicator/replicator-quickstart.html)

@@ -1,31 +1,49 @@
 version: "3.9"
 services:
-  zookeeper:
+# ZOOKEEPER
+  zookeeperSource:
     image: confluentinc/cp-zookeeper
-    container_name: zookeeper
+    container_name: zsource
     environment:
+      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
-  
-  kafka1:
-    image: confluentinc/cp-kafka
-    container_name: ksource
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      #KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-  
-  kafka2:
-    image: confluentinc/cp-kafka
-    container_name: kdest
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kdest:29093,PLAINTEXT_HOST://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      #KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      #ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
 
+  zookeeperDest:
+    image: confluentinc/cp-zookeeper
+    container_name: zdest
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      #ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+
+# KAFKA 
+  sourcebro:
+    container_name: ksource
+    depends_on:
+      - zookeeperSource
+    build:
+      context: .
+      dockerfile: ./Kafka-source/Dockerfile-source
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
+  
+  destbro:    
+    container_name: kdest
+    depends_on:
+      - zookeeperDest
+    build:
+      context: .
+      dockerfile: ./Kafka-dest/Dockerfile-dest
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
+
+
+# MIRROR
   #mirror-maker:
   #  build: .
   #  ports: ...

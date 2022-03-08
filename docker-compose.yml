@@ -43,7 +43,12 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
 
 
-# MIRROR
-  #mirror-maker:
-  #  build: .
-  #  ports: ...
+# REPLICATOR
+  # mirror-maker:
+  # container_name: replicator
+  # depends_on:
+  #   - sourcebro
+  #   - destbro
+  # build:
+  #     context: .
+  #     dockerfile: ./MMaker/Dockerfile-mm

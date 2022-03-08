@@ -23,6 +23,17 @@ Change addresses, container names, and ports accordingly to your config.
 1. Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
 1. [Test topic creation] List topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
 1. [Test topic creation] List topics on dest: ```docker-compose exec destbro kafka-topics --bootstrap-server=localhost:9093 --list```
+1. Add ACLs to source topic ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --add --allow-principal User:ANONYMOUS --operation Read --operation Describe --topic foo --resource-pattern-type prefixed```
+1. 
+
 
 ## TODO
 - [Replicator] a lot of unmapped configs (investigate file /etc/replicator/replication.properties)
+- [Replicator] to match topic name with regex and whitelist, the resource topic needs DESCRIBE ACL
+
+## NOTES
+- check ACLs ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --list```. Expected output:        
+        
+        Current ACLs for resource `ResourcePattern(resourceType=TOPIC, name=foo, patternType=PREFIXED)`:
+        (principal=User:ANONYMOUS, host=*, operation=DESCRIBE, permissionType=ALLOW)
+        (principal=User:ANONYMOUS, host=*, operation=READ, permissionType=ALLOW)

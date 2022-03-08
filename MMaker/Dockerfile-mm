@@ -1,0 +1,9 @@
+FROM confluentinc/cp-enterprise-replicator-executable
+
+COPY ./consumer.properties /etc/replicator/consumer.properties
+COPY ./producer.properties /etc/replicator/producer.properties
+COPY ./replication.properties /etc/replicator/replication.properties
+
+ENV CONNECT_BOOTSTRAP_SERVERS=localhost:29092
+
+#ENTRYPOINT [ "replicator --cluster.id replicator --consumer.config /etc/replicator/consumer.properties --producer.config /etc/replicator/producer.properties --replication.config /etc/replicator/replication.properties --whitelist '*'" ]

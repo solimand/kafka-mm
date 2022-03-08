@@ -23,3 +23,6 @@ Change addresses, container names, and ports accordingly to your config.
 1. Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
 1. [Test topic creation] List topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
 1. [Test topic creation] List topics on dest: ```docker-compose exec destbro kafka-topics --bootstrap-server=localhost:9093 --list```
+
+## TODO
+- [Replicator] a lot of unmapped configs (investigate file /etc/replicator/replication.properties)

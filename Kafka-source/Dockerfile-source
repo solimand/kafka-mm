@@ -1,4 +1,5 @@
 FROM confluentinc/cp-kafka
 
-#ENV KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://ksource:9092 \
+COPY ./topicCreation.sh /home/appuser/topicCreation.sh
+
 ENV KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1

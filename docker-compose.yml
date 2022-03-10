@@ -15,14 +15,14 @@ services:
     networks:
       - kafka-net
 
-  zookeeperDest:
-    image: confluentinc/cp-zookeeper
-    container_name: zdest
-    environment:
-      ZOOKEEPER_SERVER_ID: 2
-      ZOOKEEPER_CLIENT_PORT: 2182
-    networks:
-      - kafka-net
+  # zookeeperDest:
+  #   image: confluentinc/cp-zookeeper
+  #   container_name: zdest
+  #   environment:
+  #     ZOOKEEPER_SERVER_ID: 2
+  #     ZOOKEEPER_CLIENT_PORT: 2182
+  #   networks:
+  #     - kafka-net
 
 # KAFKA 
   sourcebro:
@@ -38,20 +38,21 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
     networks:
       - kafka-net
+    #command: sh -c "./home/appuser/topicCreation.sh"
   
-  destbro:    
-    container_name: kdest
-    depends_on:
-      - zookeeperDest
-    build:
-      context: .
-      dockerfile: ./Kafka-dest/Dockerfile-dest
-    environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
-    networks:
-      - kafka-net
+  # destbro:    
+  #   container_name: kdest
+  #   depends_on:
+  #     - zookeeperDest
+  #   build:
+  #     context: .
+  #     dockerfile: ./Kafka-dest/Dockerfile-dest
+  #   environment:
+  #     KAFKA_BROKER_ID: 2
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
+  #   networks:
+  #     - kafka-net
 
 
 # REPLICATOR

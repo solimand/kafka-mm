@@ -1,4 +1,9 @@
 version: "3.9"
+# NET
+networks:
+  kafka-net:
+    name: kafka-net
+
 services:
 # ZOOKEEPER
   zookeeperSource:
@@ -7,7 +12,8 @@ services:
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
-      #ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+    networks:
+      - kafka-net
 
   zookeeperDest:
     image: confluentinc/cp-zookeeper
@@ -15,7 +21,8 @@ services:
     environment:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2182
-      #ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+    networks:
+      - kafka-net
 
 # KAFKA 
   sourcebro:
@@ -29,6 +36,8 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
+    networks:
+      - kafka-net
   
   destbro:    
     container_name: kdest
@@ -41,6 +50,8 @@ services:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
+    networks:
+      - kafka-net
 
 
 # REPLICATOR

@@ -12,11 +12,12 @@ Change addresses, container names, and ports accordingly to your system config.
 1. Run compose: ```docker-compose up -d```
 1. Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
 1. Add ACLs to source topic ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --add --allow-principal User:ANONYMOUS --operation Read --operation Describe --topic foo --resource-pattern-type prefixed```
-1. cd MMaker > ```docker build -f .\Dockerfile-mm -t myrep .``` > ```docker run --net=kafka-mm_default --name therep -dt myrep```
+1. cd MMaker > ```docker build -f .\Dockerfile-mm -t myrep .``` > ```docker run --net=kafka-net --name therep -dt myrep```
 1. [Test mirroring] Check messagges on broker dest: ```docker-compose exec destbro kafka-console-consumer --topic foo.mirror --bootstrap-server localhost:9093 --from-beginning```
 
 ## TODOs
 - [CI] Automate topic/ACL creation
+- [Standalone-Replicator] Install JAVA and other deps of ```connect-mirror-maker.sh```
 - [Replicator] a lot of unmapped configs (investigate file /etc/replicator/replication.properties)
 - [Replicator] to match topic name with regex and whitelist, the resource topic needs DESCRIBE ACL
 

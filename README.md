@@ -34,7 +34,7 @@ Some useful commands.
 
 - List Topics on Kafka Source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
 - List Topics on Kafka Dest: ```docker-compose exec destbro kafka-topics --bootstrap-server=localhost:9093 --list```
-- Delete ALL topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
+- Delete ALL topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --delete --topic '.*'```
 
 ### Prod/Cons
 - Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
@@ -52,3 +52,5 @@ Some useful commands.
 1. MirrorMaker 2:
     - [Mirror Maker 2 Usage](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0#KIP382:MirrorMaker2.0-Walkthrough:RunningMirrorMaker2.0)
     - [A small tutorial](https://medium.com/larus-team/how-to-setup-mirrormaker-2-0-on-apache-kafka-multi-cluster-environment-87712d7997a4)
+    - [Distributed Worker Configuration](https://docs.confluent.io/platform/current/connect/references/allconfigs.html#distributed-worker-configuration)
+    - [Kafka Connect Internal Topics](https://docs.confluent.io/home/connect/self-managed/userguide.html#kconnect-internal-topics)

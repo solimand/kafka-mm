@@ -14,14 +14,13 @@ We built a novel container with Kafka binaries and dependencies needed by the Mi
 Change addresses, container names, and ports accordingly to your system config. 
 
 1. Clean prev. tests: ```docker-compose down && docker-compose rm```
-1. Run compose: ```docker-compose up -d```
-1. Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
-    - HEAVY MM
+1. Run compose: ```docker-compose up -d``` (automatically run the MirrorMaker2)
+    - For the old _HEAVY MM_
         1. Add ACLs to source topic ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --add --allow-principal User:ANONYMOUS --operation Read --operation Describe --topic foo --resource-pattern-type prefixed```
         1. cd MMaker > ```docker build -f .\Dockerfile-mm -t myrep .``` > ```docker run --net=kafka-net --name therep -dt myrep``` > docker run...
-    - LIGHT MM
-        1. cd LMM > ```docker build -f .\Dockerfile-lmm -t myrep .``` > ```docker run --net=kafka-net --name therep -dt myrep``` > docker run...
-1. [Test mirroring] Check messagges on broker dest: ```docker-compose exec destbro kafka-console-consumer --topic foo.mirror --bootstrap-server localhost:9093 --from-beginning```
+1. Test mirroring
+    - Produce on broker source: ```docker-compose exec sourcebro kafka-console-producer --topic foo --bootstrap-server localhost:9092```
+    - Check messagges on broker dest: ```docker-compose exec destbro kafka-console-consumer --topic source.foo --bootstrap-server localhost:9093 --from-beginning```
 
 ## TODOs
 - [CI] Automate topic/ACL creation
@@ -44,6 +43,7 @@ Some useful commands.
 - Delete ALL topics on source: ```docker-compose exec sourcebro kafka-topics --bootstrap-server=localhost:9092 --list```
 
 ### Prod/Cons
+- Create topic on source: ```docker-compose exec sourcebro kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server localhost:9092```
 - Start a producer on Kafka Source (topic foo): ```docker-compose exec sourcebro kafka-console-producer --topic foo --bootstrap-server localhost:9092``` > CTRL-c at the end
 - Start a consumer on Kafka Source (topic foo): ```docker-compose exec sourcebro kafka-console-consumer --topic foo --bootstrap-server localhost:9092 --from-beginning```
 - Start a consumer on Kafka Dest (topic foo.mirror): ```docker-compose exec destbro kafka-console-consumer --topic foo.mirror --bootstrap-server localhost:9092 --from-beginning``` 

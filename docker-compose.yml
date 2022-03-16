@@ -38,9 +38,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
     networks:
       - kafka-net
-    #command: sh -c "./home/appuser/topicCreation.sh"
   
-  destbro:    
+  destbro:
     container_name: kdest
     depends_on:
       - zookeeperDest
@@ -54,13 +53,28 @@ services:
     networks:
       - kafka-net
 
+# MIRROR
+  mirror-maker:
+    container_name: replicator
+    depends_on:
+      - kafka-setup
+      - destbro
+    build:
+      context: .
+      dockerfile: ./LMM/Dockerfile-lmm
+    networks:
+      - kafka-net
 
-# REPLICATOR
-  # mirror-maker:
-  # container_name: replicator
-  # depends_on:
-  #   - sourcebro
-  #   - destbro
-  # build:
-  #     context: .
-  #     dockerfile: ./MMaker/Dockerfile-mm
+# This "container" is a workaround to pre-create topics
+  kafka-setup:
+    image: confluentinc/cp-kafka
+    hostname: kafka-setup
+    container_name: kafka-setup
+    depends_on:
+      - zookeeperSource
+      - sourcebro
+    networks:
+      - kafka-net
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+      cub kafka-ready -b sourcebro:9092 1 20 && \
+      kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"

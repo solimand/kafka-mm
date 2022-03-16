@@ -22,12 +22,6 @@ Change addresses, container names, and ports accordingly to your system config.
     - Produce on broker source: ```docker-compose exec sourcebro kafka-console-producer --topic foo --bootstrap-server localhost:9092```
     - Check messagges on broker dest: ```docker-compose exec destbro kafka-console-consumer --topic source.foo --bootstrap-server localhost:9093 --from-beginning```
 
-## TODOs
-- [CI] Automate topic/ACL creation
-- [Standalone-Replicator Container] Wait for Kafka readiness 
-- [Replicator] a lot of unmapped configs (investigate file /etc/replicator/replication.properties)
-- [Replicator] to match topic name with regex and whitelist, the resource topic needs DESCRIBE ACL
-
 ## Cheatsheet
 Some useful commands.
 

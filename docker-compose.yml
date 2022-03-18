@@ -52,8 +52,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
     networks:
       - kafka-net
-    volumes:
-      - ./testssl:/usr/share/certs
+    # volumes:
+    #   - ./testssl:/usr/share/certs
 
 # MIRROR
   mirror-maker:

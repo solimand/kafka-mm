@@ -42,6 +42,16 @@ SSL kafka (https://docs.confluent.io/platform/current/security/security_tutorial
     keytool -keystore kafka.server.keystore.jks -alias CARoot -importcert -file ca-cert
     keytool -keystore kafka.server.keystore.jks -alias localhost -importcert -file cert-signed
 
+8-Verify (brokers)
+    keytool -list -v -keystore .\kafka.server.keystore.jks
+    Expected Outputs
+        [...]
+        Your keystore contains 2 entries
+        Alias name: caroot
+        [...]
+        Alias name: localhost
+        [...]
+
 ----------------------------------------------------------------------------------------------------------
     keystore pwd: keystorepwd
     ca-cert: the certificate of the CA --- KCA.crt

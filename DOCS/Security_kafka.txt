@@ -1,0 +1,62 @@
+SSL kafka (https://docs.confluent.io/platform/current/security/security_tutorial.html#generate-the-keys-and-certificates)
+
+1-Generate the keys and certificates (brokers of kafka cluster)
+    keytool -keystore kafka.server.keystore.jks -alias localhost -keyalg RSA -genkey -validity 5000
+        What is your first and last name?
+        [Unknown]:  Unibo
+        What is the name of your organizational unit?
+        [Unknown]:  DISI
+        What is the name of your organization?
+        [Unknown]:  UNIBO
+        What is the name of your City or Locality?
+        [Unknown]:  Bologna
+        What is the name of your State or Province?
+        [Unknown]:  BO
+        What is the two-letter country code for this unit?
+        [Unknown]:  IT
+        Is CN=Unibo, OU=DISI, O=UNIBO, L=Bologna, ST=BO, C=IT
+
+2-Generate CA (on CA node) 
+    openssl req -new -x509 -keyout KCA.key -out KCA.crt -days 5000
+        Country Name (2 letter code) [AU]:IT
+        State or Province Name (full name) [Some-State]:BO
+        Locality Name (eg, city) []:Bologna
+        Organization Name (eg, company) [Internet Widgits Pty Ltd]:UNIBO
+        Organizational Unit Name (eg, section) []:DISI
+        Common Name (e.g. server FQDN or YOUR name) []:kafka
+        Email Address []:.
+
+3-Add the generated CA to the clients’ truststore (client) (optional)
+    keytool -keystore kafka.client.truststore.jks -alias CARoot -importcert -file ca-cert
+
+4-Add the generated CA to the brokers’ truststore (broker) (same pwd)
+    keytool -keystore kafka.server.truststore.jks -alias CARoot -importcert -file KCA.crt
+
+5-Export the certificate from the keystore (broker):
+    keytool -keystore kafka.server.keystore.jks -alias localhost -certreq -file cert-file
+    
+6-Sign it with the CA (CA Node):
+    openssl x509 -req -CA KCA.crt -CAkey KCA.key -in cert-file -out cert-signed -days 5000 -CAcreateserial -passin pass:keystorepwd
+
+7-Import both the certificate of the CA and the signed certificate into the broker keystore (broker):
+    keytool -keystore kafka.server.keystore.jks -alias CARoot -importcert -file ca-cert
+    keytool -keystore kafka.server.keystore.jks -alias localhost -importcert -file cert-signed
+
+----------------------------------------------------------------------------------------------------------
+    keystore pwd: keystorepwd
+    ca-cert: the certificate of the CA --- KCA.crt
+    ca-key: the private key of the CA --- KCA.key
+    ca-password: the passphrase of the CA --- keystorepwd
+    cert-file: the exported, unsigned certificate of the server --- broker-cert
+    cert-signed: the signed certificate of the server --- broker-signed
+----------------------------------------------------------------------------------------------------------
+    
+HOW TO
+
+Disable Host Name Verification
+    ssl.endpoint.identification.algorithm=
+
+    ./bin/kafka-configs --bootstrap-server localhost:9093 --entity-type brokers --entity-name 0 --alter \
+        --add-config "listener.name.internal.ssl.endpoint.identification.algorithm="
+
+

@@ -5,15 +5,23 @@ networks:
     name: kafka-net
 
 services:
+# SUPPORT Containers
+  # minibox:
+  #   image: busybox
+  #   container_name: utils
+  #   command: tail -F anything # wait undefinetly the file "anything"
+  #   networks:
+  #     - kafka-net
+    
 # ZOOKEEPER
-  zookeeperSource:
-    image: confluentinc/cp-zookeeper
-    container_name: zsource
-    environment:
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_CLIENT_PORT: 2181
-    networks:
-      - kafka-net
+  # zookeeperSource:
+  #   image: confluentinc/cp-zookeeper
+  #   container_name: zsource
+  #   environment:
+  #     ZOOKEEPER_SERVER_ID: 1
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #   networks:
+  #     - kafka-net
 
   zookeeperDest:
     image: confluentinc/cp-zookeeper
@@ -21,23 +29,26 @@ services:
     environment:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2182
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/zookeeper/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider -Dzookeeper.requireClientAuthScheme=sasl
     networks:
       - kafka-net
+    volumes:
+      - ./Zoo-dest/:/etc/zookeeper
 
 # KAFKA 
-  sourcebro:
-    container_name: ksource
-    depends_on:
-      - zookeeperSource
-    build:
-      context: .
-      dockerfile: ./Kafka-source/Dockerfile-source
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
-    networks:
-      - kafka-net
+  # sourcebro:
+  #   container_name: ksource
+  #   depends_on:
+  #     - zookeeperSource
+  #   build:
+  #     context: .
+  #     dockerfile: ./Kafka-source/Dockerfile-source
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
+  #   networks:
+  #     - kafka-net
   
   destbro:
     container_name: kdest
@@ -46,37 +57,35 @@ services:
     build:
       context: .
       dockerfile: ./Kafka-dest/Dockerfile-dest
-    environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://destbro:9093
     networks:
       - kafka-net
-    # volumes:
-    #   - ./testssl:/usr/share/certs
+    env_file:
+      - ./Kafka-dest/brokerdest.env
+    volumes:
+      - ./Kafka-dest/secrets/:/etc/kafka/secrets
 
 # MIRROR
-  mirror-maker:
-    container_name: replicator
-    depends_on:
-      - kafka-setup
-      - destbro
-    build:
-      context: .
-      dockerfile: ./LMM/Dockerfile-lmm
-    networks:
-      - kafka-net
+  # mirror-maker:
+  #   container_name: replicator
+  #   depends_on:
+  #     - kafka-setup
+  #     - destbro
+  #   build:
+  #     context: .
+  #     dockerfile: ./LMM/Dockerfile-lmm
+  #   networks:
+  #     - kafka-net
 
 # This "container" is a workaround to pre-create topics
-  kafka-setup:
-    image: confluentinc/cp-kafka
-    hostname: kafka-setup
-    container_name: kafka-setup
-    depends_on:
-      - zookeeperSource
-      - sourcebro
-    networks:
-      - kafka-net
-    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-      cub kafka-ready -b sourcebro:9092 1 20 && \
-      kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"
+  # kafka-setup:
+  #   image: confluentinc/cp-kafka
+  #   hostname: kafka-setup
+  #   container_name: kafka-setup
+  #   depends_on:
+  #     - zookeeperSource
+  #     - sourcebro
+  #   networks:
+  #     - kafka-net
+  #   command: "bash -c 'echo Waiting for Kafka to be ready... && \
+  #     cub kafka-ready -b sourcebro:9092 1 20 && \
+  #     kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"

@@ -1,9 +1,13 @@
 FROM confluentinc/cp-kafka
 
-ENV KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+# COPY ./Kafka-dest/broker-cert /usr/share/certs/broker-cert
+# COPY ./Kafka-dest/broker-signed /usr/share/certs/broker-signed
 
-COPY ./Kafka-dest/broker-cert /usr/share/certs/broker-cert
-COPY ./Kafka-dest/broker-signed /usr/share/certs/broker-signed
+# COPY ./Kafka-dest/kafka.server.keystore.jks /usr/share/certs/kafka.server.keystore.jks
+# COPY ./Kafka-dest/kafka.server.truststore.jks /usr/share/certs/kafka.server.truststore.jks
 
-COPY ./Kafka-dest/kafka.server.keystore.jks /usr/share/certs/kafka.server.keystore.jks
-COPY ./Kafka-dest/kafka.server.truststore.jks /usr/share/certs/kafka.server.truststore.jks
+# COPY ./Kafka-dest/broker-cert /etc/kafka/secrets/broker-cert
+# COPY ./Kafka-dest/broker-signed /etc/kafka/secrets/broker-signed
+
+# COPY ./Kafka-dest/kafka.server.keystore.jks /etc/kafka/secrets/kafka.server.keystore.jks
+# COPY ./Kafka-dest/kafka.server.truststore.jks /etc/kafka/secrets/kafka.server.truststore.jks

@@ -14,7 +14,7 @@ RUN mkdir -p $WORKDIR && \
     cd $WORKDIR && \
     wget -c $KAFKA_MIRROR -O - | tar -xz
 
-COPY ./mmaker.properties $KAFKA_HOME/bin/mmaker.properties
+COPY ./LMM/mmaker.properties $KAFKA_HOME/bin/mmaker.properties
 
 # Make Kafka binaries executable
 ENV PATH="$KAFKA_HOME/bin:${PATH}"

@@ -29,7 +29,7 @@ services:
     environment:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2182
-      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/zookeeper/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider -Dzookeeper.requireClientAuthScheme=sasl
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/zookeeper/zookeeper_jaas.conf
     networks:
       - kafka-net
     volumes:

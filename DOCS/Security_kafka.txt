@@ -1,7 +1,9 @@
 SSL kafka (https://docs.confluent.io/platform/current/security/security_tutorial.html#generate-the-keys-and-certificates)
 
 1-Generate the keys and certificates (brokers of kafka cluster)
-    keytool -keystore kafka.server.keystore.jks -alias localhost -keyalg RSA -genkey -validity 5000
+    -keytool -keystore kafka.server.keystore.jks -alias localhost -keyalg RSA -genkey -validity 5000
+    -OR
+    -keytool -keystore kafka.server.keystore.jks -alias localhost -keyalg RSA -genkey -validity 5000 -storetype PKCS12 
         What is your first and last name?
         [Unknown]:  Unibo
         What is the name of your organizational unit?
@@ -16,7 +18,7 @@ SSL kafka (https://docs.confluent.io/platform/current/security/security_tutorial
         [Unknown]:  IT
         Is CN=Unibo, OU=DISI, O=UNIBO, L=Bologna, ST=BO, C=IT
 
-2-Generate CA (on CA node) 
+2-Generate CA (simply a key pair) 
     openssl req -new -x509 -keyout KCA.key -out KCA.crt -days 5000
         Country Name (2 letter code) [AU]:IT
         State or Province Name (full name) [Some-State]:BO
@@ -29,7 +31,7 @@ SSL kafka (https://docs.confluent.io/platform/current/security/security_tutorial
 3-Add the generated CA to the clients’ truststore (client) (optional)
     keytool -keystore kafka.client.truststore.jks -alias CARoot -importcert -file ca-cert
 
-4-Add the generated CA to the brokers’ truststore (broker) (same pwd)
+4-Add the generated CA to the brokers’ truststore (broker) (used same pwd)
     keytool -keystore kafka.server.truststore.jks -alias CARoot -importcert -file KCA.crt
 
 5-Export the certificate from the keystore (broker):

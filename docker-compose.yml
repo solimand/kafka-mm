@@ -59,8 +59,29 @@ services:
       dockerfile: ./Kafka-dest/Dockerfile-dest
     networks:
       - kafka-net
-    env_file:
-      - ./Kafka-dest/brokerdest.env
+    #env_file:
+    #  - ./Kafka-dest/brokerdest.env
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ADVERTISED_LISTENERS: SSL://:9093 #,SASL_SSL://:9094
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks      
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
+
+      # KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore-cred
+      # KAFKA_SSL_KEY_CREDENTIALS: cert-signed
+      # KAFKA_SSL_TRUSTSTORE_CREDENTIALS: keystore-cred
+
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore-cred
+      KAFKA_SSL_KEY_CREDENTIALS: keystore-cred
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: keystore-cred
+      
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_SSL_CLIENT_AUTH: requested
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/kafka_dest_jaas.conf
     volumes:
       - ./Kafka-dest/secrets/:/etc/kafka/secrets
 
@@ -77,15 +98,18 @@ services:
   #     - kafka-net
 
 # This "container" is a workaround to pre-create topics
-  # kafka-setup:
-  #   image: confluentinc/cp-kafka
-  #   hostname: kafka-setup
-  #   container_name: kafka-setup
-  #   depends_on:
-  #     - zookeeperSource
-  #     - sourcebro
-  #   networks:
-  #     - kafka-net
-  #   command: "bash -c 'echo Waiting for Kafka to be ready... && \
-  #     cub kafka-ready -b sourcebro:9092 1 20 && \
-  #     kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"
+  kafka-setup:
+    image: confluentinc/cp-kafka
+    hostname: kafka-setup
+    container_name: kafka-setup
+    depends_on:
+      # - zookeeperSource
+      # - sourcebro
+      - zookeeperSource
+      - destbro
+    networks:
+      - kafka-net
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+      cub kafka-ready -b sourcebro:9092 1 20 && \
+      kafka-topics --bootstrap-server=localhost:9093 --list'"
+      # kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"

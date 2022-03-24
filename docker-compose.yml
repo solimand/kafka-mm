@@ -5,7 +5,7 @@ networks:
     name: kafka-net
 
 services:
-# SUPPORT Containers
+# UTILS Containers
   # minibox:
   #   image: busybox
   #   container_name: utils
@@ -14,14 +14,14 @@ services:
   #     - kafka-net
     
 # ZOOKEEPER
-  # zookeeperSource:
-  #   image: confluentinc/cp-zookeeper
-  #   container_name: zsource
-  #   environment:
-  #     ZOOKEEPER_SERVER_ID: 1
-  #     ZOOKEEPER_CLIENT_PORT: 2181
-  #   networks:
-  #     - kafka-net
+  zookeeperSource:
+    image: confluentinc/cp-zookeeper
+    container_name: zsource
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - kafka-net
 
   zookeeperDest:
     image: confluentinc/cp-zookeeper
@@ -36,19 +36,21 @@ services:
       - ./Zoo-dest/:/etc/zookeeper
 
 # KAFKA 
-  # sourcebro:
-  #   container_name: ksource
-  #   depends_on:
-  #     - zookeeperSource
-  #   build:
-  #     context: .
-  #     dockerfile: ./Kafka-source/Dockerfile-source
-  #   environment:
-  #     KAFKA_BROKER_ID: 1
-  #     KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
-  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
-  #   networks:
-  #     - kafka-net
+  sourcebro:
+    container_name: ksource
+    depends_on:
+      - zookeeperSource
+    build:
+      context: .
+      dockerfile: ./Kafka-source/Dockerfile-source
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092      
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_TOPICS: "foo:1:1"
+    networks:
+      - kafka-net
   
   destbro:
     container_name: kdest
@@ -59,8 +61,6 @@ services:
       dockerfile: ./Kafka-dest/Dockerfile-dest
     networks:
       - kafka-net
-    #env_file:
-    #  - ./Kafka-dest/brokerdest.env
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
@@ -68,9 +68,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: SSL://:9093 #,SASL_SSL://:9094
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks      
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
-
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
-      KAFKA_TOPICS: "foo:1:1"
 
       KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore-cred
       KAFKA_SSL_KEY_CREDENTIALS: keystore-cred

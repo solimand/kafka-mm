@@ -14,6 +14,7 @@ We built a novel container with Kafka binaries and dependencies needed by the Mi
 Change addresses, container names, and ports accordingly to your system config. 
 
 1. Clean prev. tests: ```docker-compose down && docker-compose rm```
+1. Copy SSL "secrets" in folder ```./Kafka-dest```
 1. Run compose: ```docker-compose up -d``` (automatically run the MirrorMaker2)
     - For the old _HEAVY MM_
         1. Add ACLs to source topic ```docker-compose exec sourcebro kafka-acls --authorizer kafka.security.authorizer.AclAuthorizer --authorizer-properties zookeeper.connect=zsource:2181 --add --allow-principal User:ANONYMOUS --operation Read --operation Describe --topic foo --resource-pattern-type prefixed```

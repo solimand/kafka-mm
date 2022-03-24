@@ -69,9 +69,8 @@ services:
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks      
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
 
-      # KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore-cred
-      # KAFKA_SSL_KEY_CREDENTIALS: cert-signed
-      # KAFKA_SSL_TRUSTSTORE_CREDENTIALS: keystore-cred
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_TOPICS: "foo:1:1"
 
       KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore-cred
       KAFKA_SSL_KEY_CREDENTIALS: keystore-cred
@@ -96,20 +95,3 @@ services:
   #     dockerfile: ./LMM/Dockerfile-lmm
   #   networks:
   #     - kafka-net
-
-# This "container" is a workaround to pre-create topics
-  kafka-setup:
-    image: confluentinc/cp-kafka
-    hostname: kafka-setup
-    container_name: kafka-setup
-    depends_on:
-      # - zookeeperSource
-      # - sourcebro
-      - zookeeperSource
-      - destbro
-    networks:
-      - kafka-net
-    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-      cub kafka-ready -b sourcebro:9092 1 20 && \
-      kafka-topics --bootstrap-server=localhost:9093 --list'"
-      # kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server sourcebro:9092'"

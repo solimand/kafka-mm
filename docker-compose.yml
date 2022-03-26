@@ -48,7 +48,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092      
       KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
-      KAFKA_TOPICS: "foo:1:1"
     networks:
       - kafka-net
   
@@ -65,7 +64,13 @@ services:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_ADVERTISED_LISTENERS: SSL://:9093 #,SASL_SSL://:9094
+      # DEV
+      KAFKA_ADVERTISED_LISTENERS: SSL://:9093,kdest://:9094, localhost://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: kdest:SASL_SSL, SSL:SSL, localhost:PLAINTEXT
+      # PROD
+      # KAFKA_ADVERTISED_LISTENERS: SSL://:9093,kdest://:9094
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: kdest:SASL_SSL, SSL:SSL
+      
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks      
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
 
@@ -77,18 +82,31 @@ services:
       KAFKA_LISTENER_NAME_INTERNAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
       KAFKA_SSL_CLIENT_AUTH: requested
       KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISMS_INTER_BROKER_PROTOCOL: PLAIN
+      
+      #ONLY FOR TEST!!!
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+
       KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/kafka_dest_jaas.conf
     volumes:
       - ./Kafka-dest/secrets/:/etc/kafka/secrets
+    ports:
+      - 29093:9093
+      - 29094:9094
 
 # MIRROR
-  # mirror-maker:
-  #   container_name: replicator
-  #   depends_on:
-  #     - kafka-setup
-  #     - destbro
-  #   build:
-  #     context: .
-  #     dockerfile: ./LMM/Dockerfile-lmm
-  #   networks:
-  #     - kafka-net
+  mirror-maker:
+    container_name: replicator
+    depends_on:
+      # - kafka-setup
+      - destbro
+    build:
+      context: .
+      dockerfile: ./LMM/Dockerfile-lmm
+    networks:
+      - kafka-net
+    volumes:
+      - ./LMM/secrets/:/etc/kafka/secrets
+      - ./LMM/mmaker.properties:/root/workspace/kafka_2.13-3.1.0/bin/mmaker.properties 

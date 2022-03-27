@@ -14,10 +14,8 @@ RUN mkdir -p $WORKDIR && \
     cd $WORKDIR && \
     wget -c $KAFKA_MIRROR -O - | tar -xz
 
-#COPY ./LMM/mmaker.properties $KAFKA_HOME/bin/mmaker.properties
-
 # Make Kafka binaries executable
 ENV PATH="$KAFKA_HOME/bin:${PATH}"
 
 # Run the mirror
-ENTRYPOINT connect-mirror-maker.sh $KAFKA_HOME/bin/mmaker.properties
+ENTRYPOINT connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties

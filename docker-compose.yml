@@ -33,7 +33,7 @@ services:
     networks:
       - kafka-net
     volumes:
-      - ./Zoo-dest/:/etc/zookeeper
+      - ./Zoo-dest/secrets:/etc/zookeeper
 
 # KAFKA 
   sourcebro:

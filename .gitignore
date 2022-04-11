@@ -1,4 +1,2 @@
 env/
-testssl/
-Kafka-dest/secrets
-LMM/secrets
+secrets/

@@ -1,0 +1,43 @@
+version: "3.9"
+# NET
+networks:
+  proxy-redirect:
+    external: false
+    name: proxy-redirect
+
+services:
+  zookeeperSource:
+    image: confluentinc/cp-zookeeper
+    container_name: zsource
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - proxy-redirect
+
+  sourcebro:
+    container_name: ksource
+    image: confluentinc/cp-kafka
+    depends_on:
+      - zookeeperSource
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperSource:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ksource:9092
+      #KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - proxy-redirect
+
+  mirror-maker:
+    container_name: replicator
+    depends_on:
+      - sourcebro
+    build:
+      context: .
+      dockerfile: ./LMM/Dockerfile-lmm
+    networks:
+      - proxy-redirect
+    volumes:
+      - ./LMM/secrets/:/etc/kafka/secrets
+            

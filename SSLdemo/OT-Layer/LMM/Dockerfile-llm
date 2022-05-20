@@ -1,4 +1,5 @@
-FROM debian
+#FROM debian
+FROM openjdk
 
 ENV MYHOME="/root"
 ENV WORKDIR="$MYHOME/workspace"
@@ -7,7 +8,8 @@ ENV KAFKA_HOME="$WORKDIR/kafka_2.13-3.1.0"
 
 # Installing dependencies (and Java 11)
 RUN apt update && \
-    apt install -y sudo git iputils-ping curl apt-transport-https ca-certificates wget dirmngr gnupg software-properties-common default-jdk
+    #apt install -y sudo git iputils-ping curl apt-transport-https ca-certificates wget dirmngr gnupg software-properties-common default-jdk
+    apt install -y wget    
 
 # Download Kafka
 RUN mkdir -p $WORKDIR && \

@@ -30,13 +30,18 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeperDest:2182
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       # DEV
-      KAFKA_LISTENERS: SSL://:9093, kdest://:9094, localhost://:9092
-      KAFKA_ADVERTISED_LISTENERS: SSL://10.0.7.115:29093,kdest://10.0.7.115:29094, localhost://:9092
+        # Listeners (what interfaces Kafka binds to)
+        # Adv_listeners (how clients can connect)
+        # Prot MAP (key/value pairs for the security protocol to use per listener name)
+        # WHY? You need to tell Kafka how the brokers can reach each other but also make sure that external clients (producers/consumers) can reach the broker they need to reach.
+      KAFKA_LISTENERS: SSL://destbro:9093, kdest://destbro:9094, localhost://:9092
+      KAFKA_ADVERTISED_LISTENERS: SSL://destbro:9093,kdest://destbro:9094, localhost://:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: kdest:SASL_SSL,SSL:SSL,localhost:PLAINTEXT
       # PROD
       # KAFKA_ADVERTISED_LISTENERS: SSL://:9093,kdest://:9094
       # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: kdest:SASL_SSL, SSL:SSL
       
+
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks      
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
 
@@ -55,7 +60,7 @@ services:
       KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/kafka_dest_jaas.conf
     volumes:
       - ./Kafka-dest/secrets/:/etc/kafka/secrets
-    ports:
-      - 29093:9093
-      - 29094:9094
+    # ports:
+    #   - 29093:9093
+    #   - 29094:9094
                   

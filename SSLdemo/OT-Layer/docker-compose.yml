@@ -38,6 +38,6 @@ services:
       dockerfile: ./LMM/Dockerfile-lmm
     networks:
       - proxy-redirect
-    volumes:
-      - ./LMM/secrets/:/etc/kafka/secrets
+    #debug
+    # command: tail -F anything # -F waits the "anything" file to appear indefinitely
             

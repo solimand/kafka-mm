@@ -18,10 +18,13 @@ RUN mkdir -p $WORKDIR && \
 # Make Kafka binaries executable
 ENV PATH="$KAFKA_HOME/bin:${PATH}"
 
+# Copy configuration and SSL secrets
+COPY /LMM/secrets/ /etc/kafka/secrets/
+
 # only debug
-# COPY secrets/mmaker.properties /etc/kafka/secrets/mmaker.properties
 # RUN ls -lha $KAFKA_HOME/bin/connect-mirror-maker.sh
 # RUN cat /etc/kafka/secrets/mmaker.properties
 
 # Run the mirror
-ENTRYPOINT $KAFKA_HOME/bin/connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties
+# ENTRYPOINT $KAFKA_HOME/bin/connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties
+ENTRYPOINT connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties

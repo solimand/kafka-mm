@@ -1,5 +1,4 @@
-#FROM debian
-FROM openjdk
+FROM alpine
 
 ENV MYHOME="/root"
 ENV WORKDIR="$MYHOME/workspace"
@@ -7,9 +6,9 @@ ENV KAFKA_MIRROR="https://dlcdn.apache.org/kafka/3.1.0/kafka_2.13-3.1.0.tgz"
 ENV KAFKA_HOME="$WORKDIR/kafka_2.13-3.1.0"
 
 # Installing dependencies (and Java 11)
-RUN apt update && \
-    #apt install -y sudo git iputils-ping curl apt-transport-https ca-certificates wget dirmngr gnupg software-properties-common default-jdk
-    apt install -y wget    
+RUN apk --update-cache upgrade && \
+    apk add openjdk11 wget && \
+    apk add --no-cache --upgrade bash
 
 # Download Kafka
 RUN mkdir -p $WORKDIR && \
@@ -19,5 +18,10 @@ RUN mkdir -p $WORKDIR && \
 # Make Kafka binaries executable
 ENV PATH="$KAFKA_HOME/bin:${PATH}"
 
+# only debug
+# COPY secrets/mmaker.properties /etc/kafka/secrets/mmaker.properties
+# RUN ls -lha $KAFKA_HOME/bin/connect-mirror-maker.sh
+# RUN cat /etc/kafka/secrets/mmaker.properties
+
 # Run the mirror
-ENTRYPOINT connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties
+ENTRYPOINT $KAFKA_HOME/bin/connect-mirror-maker.sh /etc/kafka/secrets/mmaker.properties
